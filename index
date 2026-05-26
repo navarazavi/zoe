@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>zoë</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,200;0,300;0,400;1,200&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0A0A0A;--surface:#141414;--surface2:#1C1C1C;
+  --border:rgba(255,255,255,0.06);--border-med:rgba(255,255,255,0.10);--border-strong:rgba(255,255,255,0.16);
+  --text:#F2EEE8;--text-2:#555555;--text-3:#2A2A2A;
+  --red:#B91C1C;--danger:#C47A7A;--warn:#C4A46A;--ok:#7AAA7A;
+}
+html,body{height:100%;background:var(--bg);overflow:hidden;color:var(--text);font-family:-apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, sans-serif;font-weight:300;-webkit-font-smoothing:antialiased;cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='24' viewBox='0 0 16 24'%3E%3Cpath d='M0 0 L0 20 L4.5 15.5 L8 22 L10.5 21 L7 14 L13 14 Z' fill='%23C0001A' stroke='black' stroke-width='1.2' stroke-linejoin='round'/%3E%3C/svg%3E") 0 0, auto}
+body{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:0 1.5rem}
+#static{position:fixed;inset:-5%;width:110%;height:110%;pointer-events:none;z-index:0;opacity:0.035;transition:transform 0.3s cubic-bezier(0.16,1,0.3,1);will-change:transform}
+.page{position:relative;z-index:1}
+.page{width:100%;max-width:680px;display:flex;flex-direction:column;align-items:center}.chat-wrap{width:100%}
+.wordmark{margin-bottom:3rem;text-align:center}
+.wordmark svg{display:block;margin:0 auto}
+.chat-messages{width:100%;max-height:45vh;overflow-y:auto;display:flex;flex-direction:column;align-items:flex-start;gap:1.25rem;margin-bottom:1.5rem;scrollbar-width:none;padding:0 0.5rem}
+.chat-messages::-webkit-scrollbar{display:none}
+.chat-messages:empty{display:none}
+.msg{font-size:0.78rem;font-weight:500;letter-spacing:0.02em;line-height:1.75;animation:rise 0.4s cubic-bezier(0.16,1,0.3,1) both;width:100%;display:flex}.msg.user{justify-content:flex-end}.msg.bot{justify-content:flex-start}
+.msg.user span{color:rgba(255,255,255,0.92);max-width:65%;text-align:right;background:#2A2A2A;padding:8px 14px;border-radius:18px 18px 4px 18px;box-shadow:0 0 0 0.5px rgba(255,255,255,0.08);display:inline-block}
+.msg.bot span{color:rgba(255,255,255,0.92);white-space:pre-wrap;font-style:normal!important;background:#1E1E1E;padding:10px 14px;border-radius:18px 18px 18px 4px;box-shadow:0 0 0 0.5px rgba(255,255,255,0.06);max-width:80%;display:inline-block}
+.msg.bot em{font-style:italic;color:var(--text)}
+.tag{display:inline-block;border:0.5px solid var(--border-strong);color:var(--text-2);font-size:0.6rem;padding:2px 9px;border-radius:2px;margin:2px 3px 2px 0;letter-spacing:0.08em;text-transform:uppercase}
+.risk-high{color:var(--danger)}.risk-med{color:var(--warn)}.risk-ok{color:var(--ok)}
+.input-wrap{width:100%;display:flex;flex-direction:column;gap:10px}
+.input-row{width:100%;display:flex;align-items:center;background:#1C1C1C;border:none;border-radius:10px;padding:4px 8px 4px 14px;box-shadow:0 0 0 0.5px rgba(255,255,255,0.08);transition:box-shadow 0.2s}
+.input-row:focus-within{box-shadow:0 0 0 0.5px rgba(255,255,255,0.2)}
+.input-row input{flex:1;font-family:-apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, sans-serif;font-size:0.8rem;font-weight:500;padding:8px 0;border:none;background:transparent;color:var(--text);outline:none;letter-spacing:0.01em}
+.input-row input::placeholder{color:rgba(255,255,255,0.35);font-weight:500;letter-spacing:0.01em}
+.send-btn{width:24px;height:24px;border-radius:50%;border:none;background:var(--text);color:var(--bg);display:flex;align-items:center;justify-content:center;cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='24' viewBox='0 0 16 24'%3E%3Cpath d='M0 0 L0 20 L4.5 15.5 L8 22 L10.5 21 L7 14 L13 14 Z' fill='%23C0001A' stroke='black' stroke-width='1.2' stroke-linejoin='round'/%3E%3C/svg%3E") 0 0, auto;flex-shrink:0;transition:all 0.15s}
+.send-btn:hover{background:rgba(242,238,232,0.85)}
+.send-btn:disabled{opacity:0.4;cursor:not-allowed}
+.send-btn svg{width:10px;height:10px}
+.chips{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
+.chip{font-size:0.65rem;padding:5px 13px;border-radius:10px;border:none;background:#2A2A2A;color:rgba(255,255,255,0.55);cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='24' viewBox='0 0 16 24'%3E%3Cpath d='M0 0 L0 20 L4.5 15.5 L8 22 L10.5 21 L7 14 L13 14 Z' fill='%23C0001A' stroke='black' stroke-width='1.2' stroke-linejoin='round'/%3E%3C/svg%3E") 0 0, auto;font-family:-apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, sans-serif;letter-spacing:0.04em;font-weight:500;transition:all 0.15s;box-shadow:0 0 0 0.5px rgba(255,255,255,0.12)}
+.chip:hover{border-color:rgba(255,255,255,0.35);color:var(--text)}
+
+.typing{display:flex;gap:5px;align-items:center;padding:4px 0}
+.typing span{width:3px;height:3px;border-radius:50%;background:var(--text-2);animation:pulse 1.2s infinite}
+.typing span:nth-child(2){animation-delay:0.2s}
+.typing span:nth-child(3){animation-delay:0.4s}
+@keyframes pulse{0%,100%{opacity:0.2;transform:scale(0.7)}50%{opacity:1;transform:scale(1)}}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="wordmark"><svg width="270" height="204" viewBox="0 0 90 68" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_1_11)">
+<path d="M14.2969 48L14.9561 44.814L30.7104 28.9277L30.7324 28.8179H18.4937L19.3286 24.8188H37.5L36.7529 28.2246L21.3062 43.8911L21.2842 44.001H33.501L32.688 48H14.2969Z" fill="white"/>
+<path d="M42.3047 48.4614C40.0928 48.4614 38.1592 47.978 36.5039 47.0112C34.8633 46.0298 33.5889 44.6455 32.6807 42.8584C31.7725 41.0566 31.3184 38.918 31.3184 36.4424V36.3984C31.3184 33.9375 31.7725 31.8135 32.6807 30.0264C33.6035 28.2393 34.8853 26.8623 36.5259 25.8955C38.1812 24.9287 40.1001 24.4453 42.2827 24.4453C44.48 24.4453 46.3989 24.9287 48.0396 25.8955C49.6948 26.8477 50.9766 28.2173 51.8848 30.0044C52.8076 31.7915 53.269 33.9229 53.269 36.3984V36.4424C53.269 38.9326 52.8076 41.0713 51.8848 42.8584C50.9766 44.6455 49.7021 46.0298 48.0615 47.0112C46.4209 47.978 44.502 48.4614 42.3047 48.4614ZM42.3267 44.4624C43.5571 44.4624 44.6265 44.1475 45.5347 43.5176C46.4429 42.8877 47.146 41.9795 47.644 40.793C48.1421 39.5918 48.3911 38.1416 48.3911 36.4424V36.3984C48.3911 34.7139 48.1421 33.2783 47.644 32.0918C47.146 30.8906 46.4355 29.9824 45.5127 29.3672C44.5898 28.7373 43.5132 28.4224 42.2827 28.4224C41.0669 28.4224 39.9976 28.7373 39.0747 29.3672C38.1665 29.9971 37.4561 30.9053 36.9434 32.0918C36.4307 33.2783 36.1743 34.7139 36.1743 36.3984V36.4424C36.1743 38.1416 36.4233 39.5918 36.9214 40.793C37.4341 41.9795 38.1519 42.8877 39.0747 43.5176C39.9976 44.1475 41.0815 44.4624 42.3267 44.4624Z" fill="white"/>
+<path d="M53.5039 34.0913H65.0176C65.0322 33.9888 65.0396 33.8862 65.0396 33.7837C65.0542 33.6665 65.0615 33.5566 65.0615 33.4541C65.0615 32.5605 64.8784 31.7256 64.5122 30.9492C64.1606 30.1729 63.6113 29.5503 62.8643 29.0815C62.1318 28.5981 61.1797 28.3564 60.0078 28.3564C58.8945 28.3564 57.9058 28.6128 57.0415 29.1255C56.1772 29.6235 55.4448 30.3047 54.8442 31.1689C54.2437 32.0186 53.7969 32.9927 53.5039 34.0913ZM58.1182 48.4834C56.0088 48.4834 54.2217 48.0439 52.7568 47.165C51.3066 46.2861 50.208 45.0776 49.4609 43.5396C48.7285 41.9868 48.3623 40.1924 48.3623 38.1562C48.3623 36.2373 48.6406 34.4429 49.1973 32.7729C49.7686 31.103 50.5742 29.6382 51.6143 28.3784C52.6689 27.104 53.9141 26.1152 55.3496 25.4121C56.7852 24.709 58.3745 24.3574 60.1177 24.3574C62.0659 24.3574 63.7505 24.7603 65.1714 25.5659C66.6069 26.3716 67.7129 27.5068 68.4893 28.9717C69.2656 30.4365 69.6538 32.1797 69.6538 34.2012C69.6538 34.7139 69.6318 35.2705 69.5879 35.8711C69.5586 36.457 69.5 37.0137 69.4121 37.541H52.9766C52.9619 37.6729 52.9473 37.8047 52.9326 37.9365C52.9326 38.0537 52.9326 38.1782 52.9326 38.3101C52.9326 39.5552 53.145 40.6392 53.5698 41.562C54.0093 42.4849 54.6245 43.1953 55.4155 43.6934C56.2212 44.1914 57.166 44.4404 58.25 44.4404C59.6855 44.4404 60.9014 44.1108 61.8975 43.4517C62.8936 42.7778 63.6187 41.877 64.0728 40.749H68.6211C68.2256 42.2285 67.5298 43.5542 66.5337 44.7261C65.5376 45.8833 64.3218 46.7988 62.8862 47.4727C61.4507 48.1465 59.8613 48.4834 58.1182 48.4834ZM57.437 21.0835C56.7046 21.0835 56.0747 20.8198 55.5474 20.2925C55.0347 19.7505 54.7783 19.0986 54.7783 18.3369C54.7783 17.5752 55.0347 16.9307 55.5474 16.4033C56.0747 15.8613 56.7046 15.5903 57.437 15.5903C58.1987 15.5903 58.8359 15.8613 59.3486 16.4033C59.8613 16.9307 60.1177 17.5752 60.1177 18.3369C60.1177 19.0986 59.8613 19.7505 59.3486 20.2925C58.8359 20.8198 58.1987 21.0835 57.437 21.0835ZM66.0283 21.0835C65.2812 21.0835 64.644 20.8198 64.1167 20.2925C63.604 19.7505 63.3477 19.0986 63.3477 18.3369C63.3477 17.5752 63.604 16.9307 64.1167 16.4033C64.644 15.8613 65.2812 15.5903 66.0283 15.5903C66.7754 15.5903 67.4053 15.8613 67.918 16.4033C68.4307 16.9307 68.687 17.5752 68.687 18.3369C68.687 19.0986 68.4307 19.7505 67.918 20.2925C67.4053 20.8198 66.7754 21.0835 66.0283 21.0835Z" fill="white"/>
+</g>
+<defs>
+<clipPath id="clip0_1_11">
+<rect width="90" height="68" fill="white"/>
+</clipPath>
+</defs>
+</svg></div>
+  <div class="chat-messages" id="msgs"></div>
+  <div class="input-wrap">
+    <div class="input-row">
+      <input id="inp" placeholder="Ça va ?" onkeydown="if(event.key==='Enter'&&!event.shiftKey)send()"/>
+      <button class="send-btn" id="sendbtn" onclick="send()" aria-label="Send">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="chips">
+      <div class="chip" onclick="sendQ('zoë news')">Beauty Brief</div>
+      <div class="chip" onclick="sendQ('What ingredients or products need to be reordered this week and why')">Reorder Alerts</div>
+      <div class="chip" onclick="sendQ('Which suppliers should I be most concerned about right now and why')">Supplier Risk</div>
+      <div class="chip" onclick="sendQ('Are we ready to support a new product launch from a supply chain perspective')">Launch Readiness</div>
+      <div class="chip" onclick="sendQ('What beauty trends are going viral right now and what does that mean for our inventory')">Trend → Inventory</div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+const history=[];
+
+function addMsg(html,role){
+  const msgs=document.getElementById("msgs");
+  const el=document.createElement("div");
+  el.className="msg "+role;
+  const inner=document.createElement("span");
+  inner.innerHTML=html;
+  el.appendChild(inner);
+  msgs.appendChild(el);
+  msgs.scrollTop=msgs.scrollHeight;
+  return inner;
+}
+
+function sendQ(t){document.getElementById("inp").value=t;send();}
+
+async function send(){
+  const inp=document.getElementById("inp");
+  const btn=document.getElementById("sendbtn");
+  const q=inp.value.trim();
+  if(!q||btn.disabled)return;
+  inp.value="";
+  btn.disabled=true;
+
+  addMsg(q,"user");
+  history.push({role:"user",content:q});
+
+  // loading message
+  const loading=document.createElement("div");
+  loading.className="msg bot";
+  
+  loading.style.color="var(--text-2)";
+  loading.innerHTML="Give me a New York minute.";
+  document.getElementById("msgs").appendChild(loading);
+  document.getElementById("msgs").scrollTop=9999;
+
+  let dotCount=1;
+  const dotInterval=setInterval(()=>{
+    dotCount=(dotCount%3)+1;
+    loading.innerHTML="Give me a New York minute"+".".repeat(dotCount);
+  },400);
+
+  try{
+    const res=await fetch("/api/chat",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({messages:history})
+    });
+    const data=await res.json();
+    const reply=data.content||"Something went wrong.";
+    clearInterval(dotInterval);
+    
+    loading.style.color="";
+    loading.innerHTML=reply.replace(/\*(.*?)\*/g,"<em>$1</em>");
+    history.push({role:"assistant",content:reply});
+  }catch(e){
+    clearInterval(dotInterval);
+    loading.innerHTML="Connection error. Is the server running?";
+  }
+
+  btn.disabled=false;
+  document.getElementById("msgs").scrollTop=9999;
+}
+</script>
+<canvas id="static"></canvas>
+<script>
+const canvas=document.getElementById("static");
+const ctx=canvas.getContext("2d");
+function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+resize();
+window.addEventListener("resize",resize);
+let frame=0;
+let scanOffset=0;
+function drawStatic(){
+  frame++;
+  if(frame%3!==0){requestAnimationFrame(drawStatic);return;}
+  scanOffset=(scanOffset+0.8)%canvas.height;
+  const w=canvas.width,h=canvas.height;
+  const imageData=ctx.createImageData(w,h);
+  const data=imageData.data;
+  for(let y=0;y<h;y++){
+    // vertical scan band — brighter strip drifting down
+    const distFromScan=Math.abs(y-scanOffset);
+    const scanBrightness=distFromScan<6?0.18*Math.max(0,(6-distFromScan)/6):0;
+    // occasional full horizontal glitch lines
+    const isGlitch=Math.random()>0.997;
+    for(let x=0;x<w;x++){
+      const i=(y*w+x)*4;
+      const v=Math.random()>0.5?255:0;
+      const rShift=Math.random()>0.85?Math.floor(Math.random()*80):0;
+      const gShift=Math.random()>0.92?Math.floor(Math.random()*60):0;
+      const bShift=Math.random()>0.88?Math.floor(Math.random()*100):0;
+      const base=isGlitch?200:v;
+      data[i]=Math.min(255,base+rShift+scanBrightness*255);
+      data[i+1]=Math.min(255,base+gShift+scanBrightness*255);
+      data[i+2]=Math.min(255,base+bShift+scanBrightness*255);
+      data[i+3]=255;
+    }
+  }
+  ctx.putImageData(imageData,0,0);
+  requestAnimationFrame(drawStatic);
+}
+drawStatic();
+</script>
+</body>
+</html>
